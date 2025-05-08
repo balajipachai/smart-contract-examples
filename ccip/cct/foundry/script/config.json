@@ -1,17 +1,17 @@
 {
-  "BnMToken": {
-    "name": "BnM KH",
-    "symbol": "BnMkh",
+  "Token": {
+    "name": "Token",
+    "symbol": "TOKEN",
     "decimals": 18,
     "maxSupply": 0,
     "withGetCCIPAdmin": false,
     "ccipAdminAddress": "0x0000000000000000000000000000000000000000"
   },
   "tokenAmountToMint": 1000000000000000000000,
-  "tokenAmountToTransfer": 10000,
+  "tokenAmountToTransfer": 1000000000000000000000,
   "feeType": "native",
   "remoteChains": {
-    "43113": 421614,
-    "421614": 43113
+    "157": 11155111,
+    "11155111": 157
   }
 }

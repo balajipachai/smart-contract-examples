@@ -11,17 +11,21 @@ contract SetPool is Script {
     function run() external {
         // Get the chain name based on the current chain ID
         string memory chainName = HelperUtils.getChainName(block.chainid);
-
+        string memory tokenName = vm.envString("TOKEN_NAME");
         // Construct paths to the JSON files containing deployed token and pool addresses
         string memory root = vm.projectRoot();
-        string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken_", chainName, ".json");
-        string memory deployedPoolPath = string.concat(root, "/script/output/deployedTokenPool_", chainName, ".json");
+        string memory deployedTokenPath =
+            string.concat(root, "/script/output/deployedToken_", chainName, ".", tokenName, ".json");
+        string memory deployedPoolPath =
+            string.concat(root, "/script/output/deployedTokenPool_", chainName, ".", tokenName, ".json");
 
         // Extract the deployed token and pool addresses from the JSON files
-        address tokenAddress =
-            HelperUtils.getAddressFromJson(vm, deployedTokenPath, string.concat(".deployedToken_", chainName));
-        address poolAddress =
-            HelperUtils.getAddressFromJson(vm, deployedPoolPath, string.concat(".deployedTokenPool_", chainName));
+        address tokenAddress = HelperUtils.getAddressFromJson(
+            vm, deployedTokenPath, string.concat(".deployedToken_", chainName, ".", tokenName)
+        );
+        address poolAddress = HelperUtils.getAddressFromJson(
+            vm, deployedPoolPath, string.concat(".deployedTokenPool_", chainName, ".", tokenName)
+        );
 
         // Fetch the network configuration to get the TokenAdminRegistry address
         HelperConfig helperConfig = new HelperConfig();

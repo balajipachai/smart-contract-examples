@@ -45,6 +45,12 @@ contract DeployBurnMintTokenPool is Script {
 
         console.log("Burn & Mint token pool deployed to:", address(tokenPool));
 
+        // TODO: Since, the deployed token is not BurnMintERC677, hence, transferring the ownership of the token to the token pool
+        // TODO: Ownership Transfer MUST BE DONE AFTER CLAIMING ADMIN STEP
+        // will grant the mint and burn roles to the token pool.
+        // IOwnable(tokenAddress).transferOwnership(address(tokenPool));
+        // console.log("Granted mint and burn roles to token pool:", address(tokenPool));
+
         // Grant mint and burn roles to the token pool on the token contract
         BurnMintERC677(tokenAddress).grantMintAndBurnRoles(address(tokenPool));
         console.log("Granted mint and burn roles to token pool:", address(tokenPool));

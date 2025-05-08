@@ -9,14 +9,36 @@ library HelperUtils {
     using stdJson for string;
 
     function getChainName(uint256 chainId) internal pure returns (string memory) {
-        if (chainId == 43113) {
-            return "avalancheFuji";
-        } else if (chainId == 11155111) {
+        if (chainId == 11155111) {
             return "ethereumSepolia";
-        } else if (chainId == 421614) {
-            return "arbitrumSepolia";
-        } else if (chainId == 84532) {
-            return "baseSepolia";
+        } else if (chainId == 157) {
+            return "puppynet";
+        } else if (chainId == 1) {
+            return "ethereumMainnet";
+        } else if (chainId == 10) {
+            return "optimism";
+        } else if (chainId == 59144) {
+            return "linea";
+        } else if (chainId == 81457) {
+            return "blast";
+        } else if (chainId == 8453) {
+            return "base";
+        } else if (chainId == 43114) {
+            return "avalanche";
+        } else if (chainId == 56) {
+            return "bsc";
+        } else if (chainId == 137) {
+            return "polygon";
+        } else if (chainId == 100) {
+            return "gnosis";
+        } else if (chainId == 42161) {
+            return "arbitrum";
+        } else if (chainId == 5000) {
+            return "mantle";
+        } else if (chainId == 42220) {
+            return "celo";
+        } else if (chainId == 534352) {
+            return "scroll";
         } else {
             revert("Unsupported chain ID");
         }
@@ -27,14 +49,36 @@ library HelperUtils {
         pure
         returns (HelperConfig.NetworkConfig memory)
     {
-        if (chainId == 43113) {
-            return helperConfig.getAvalancheFujiConfig();
-        } else if (chainId == 11155111) {
+        if (chainId == 11155111) {
             return helperConfig.getEthereumSepoliaConfig();
-        } else if (chainId == 421614) {
-            return helperConfig.getArbitrumSepolia();
-        } else if (chainId == 84532) {
-            return helperConfig.getBaseSepoliaConfig();
+        } else if (chainId == 157) {
+            return helperConfig.getPuppynetConfig();
+        } else if (chainId == 109) {
+            return helperConfig.getShibariumConfig();
+        } else if (chainId == 1) {
+            return helperConfig.getEthereumMainnetConfig();
+        } else if (chainId == 10) {
+            return helperConfig.getOptimismConfig();
+        } else if (chainId == 59144) {
+            return helperConfig.getLineaConfig();
+        } else if (chainId == 81457) {
+            return helperConfig.getBlastConfig();
+        } else if (chainId == 8453) {
+            return helperConfig.getBaseConfig();
+        } else if (chainId == 43114) {
+            return helperConfig.getAvalancheConfig();
+        } else if (chainId == 56) {
+            return helperConfig.getBscConfig();
+        } else if (chainId == 137) {
+            return helperConfig.getPolygonConfig();
+        } else if (chainId == 100) {
+            return helperConfig.getGnosisConfig();
+        } else if (chainId == 5000) {
+            return helperConfig.getMantleConfig();
+        } else if (chainId == 42220) {
+            return helperConfig.getCeloConfig();
+        } else if (chainId == 534352) {
+            return helperConfig.getScrollConfig();
         } else {
             revert("Unsupported chain ID");
         }
