@@ -92,9 +92,10 @@ contract ClaimAdmin is Script {
          * Puppynet: 157
          */
         if (
+            // TODO: Add Puppynet ChainId, Once RegistryModuleOwnerCustom v1.6.0 is deployed on Puppynet
             chainId == 109 || chainId == 59144 || chainId == 81457 || chainId == 8453 || chainId == 43114
                 || chainId == 56 || chainId == 137 || chainId == 100 || chainId == 42161 || chainId == 5000
-                || chainId == 42220 || chainId == 534352 || chainId == 157
+                || chainId == 42220 || chainId == 534352
         ) {
             return true;
         }

@@ -15,8 +15,8 @@ contract ApplyChainUpdates is Script {
         // Construct paths to the configuration and local pool JSON files
         string memory root = vm.projectRoot();
         string memory configPath = string.concat(root, "/script/config.json");
-        string memory localPoolPath =
-            string.concat(root, "/script/output/deployedTokenPool_", chainName, ".", tokenName, ".json");
+        string memory tokenPoolPath = string.concat(root, "/script/output/deployedTokenPool.json");
+        string memory tokenPath = string.concat(root, "/script/output/deployedToken.json");
 
         // Read the remoteChainId from config.json based on the current chain ID
         uint256 remoteChainId = HelperUtils.getUintFromJson(
@@ -25,20 +25,16 @@ contract ApplyChainUpdates is Script {
 
         // Get the remote chain name based on the remoteChainId
         string memory remoteChainName = HelperUtils.getChainName(remoteChainId);
-        string memory remotePoolPath =
-            string.concat(root, "/script/output/deployedTokenPool_", remoteChainName, ".", tokenName, ".json");
-        string memory remoteTokenPath =
-            string.concat(root, "/script/output/deployedToken_", remoteChainName, ".", tokenName, ".json");
 
         // Extract addresses from the JSON files
         address poolAddress = HelperUtils.getAddressFromJson(
-            vm, localPoolPath, string.concat(".deployedTokenPool_", chainName, ".", tokenName)
+            vm, tokenPoolPath, string.concat(".deployedTokenPool_", chainName, ".", tokenName)
         );
         address remotePoolAddress = HelperUtils.getAddressFromJson(
-            vm, remotePoolPath, string.concat(".deployedTokenPool_", remoteChainName, ".", tokenName)
+            vm, tokenPoolPath, string.concat(".deployedTokenPool_", remoteChainName, ".", tokenName)
         );
         address remoteTokenAddress = HelperUtils.getAddressFromJson(
-            vm, remoteTokenPath, string.concat(".deployedToken_", remoteChainName, ".", tokenName)
+            vm, tokenPath, string.concat(".deployedToken_", remoteChainName, ".", tokenName)
         );
 
         // For remotePoolAddresses, create an array with the remotePoolAddress

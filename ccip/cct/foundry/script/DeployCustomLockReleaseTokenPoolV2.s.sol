@@ -4,15 +4,17 @@ pragma solidity 0.8.24;
 import {Script, console} from "forge-std/Script.sol";
 import {HelperUtils} from "./utils/HelperUtils.s.sol"; // Utility functions for JSON parsing and chain info
 import {HelperConfig} from "./HelperConfig.s.sol"; // Network configuration helper
-import {CustomLockReleaseTokenPool} from "../src/CustomLockReleaseTokenPool.sol";
+import {CustomLockReleaseTokenPoolV2} from "../src/CustomLockReleaseTokenPoolV2.sol";
 import {IERC20} from
     "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/interfaces/IERC20.sol";
 
-contract DeployCustomLockReleaseTokenPool is Script {
+contract DeployCustomLockReleaseTokenPoolV2 is Script {
     function run() external {
         // Get the chain name based on the current chain ID
         string memory chainName = HelperUtils.getChainName(block.chainid);
         string memory tokenName = vm.envString("TOKEN_NAME");
+
+        address predicate = vm.envAddress("PREDICATE_CONTRACT");
 
         // Construct the path to the deployed token JSON file
         string memory root = vm.projectRoot();
@@ -34,13 +36,14 @@ contract DeployCustomLockReleaseTokenPool is Script {
         vm.startBroadcast();
 
         // Deploy the LockReleaseTokenPool contract associated with the token
-        CustomLockReleaseTokenPool tokenPool = new CustomLockReleaseTokenPool(
+        CustomLockReleaseTokenPoolV2 tokenPool = new CustomLockReleaseTokenPoolV2(
             IERC20(tokenAddress),
             18, // The number of decimals of the token
             new address[](0), // Empty array for initial operators
             rmnProxy,
             false, // Set acceptLiquidity to false
-            router
+            router,
+            predicate
         );
 
         console.log("Lock & Release token pool deployed to:", address(tokenPool));

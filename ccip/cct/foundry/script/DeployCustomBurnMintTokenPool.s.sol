@@ -18,7 +18,7 @@ contract DeployCustomBurnMintTokenPool is Script {
 
         // Construct the path to the deployed token JSON file
         string memory root = vm.projectRoot();
-        string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken", ".json");
+        string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken.json");
 
         // Extract the deployed token address from the JSON file
         address tokenAddress = HelperUtils.getAddressFromJson(
@@ -73,15 +73,5 @@ contract DeployCustomBurnMintTokenPool is Script {
          *     console.log("Granted mint and burn roles to token pool:", address(tokenPool));
          *     vm.stopBroadcast();
          */
-
-        // Serialize and write the token pool address to a new JSON file
-        string memory jsonObj = "internal_key";
-        string memory key = string(abi.encodePacked("deployedTokenPool_", chainName, ".", tokenName));
-        string memory finalJson = vm.serializeAddress(jsonObj, key, address(tokenPool));
-
-        string memory poolFileName =
-            string(abi.encodePacked("./script/output/deployedTokenPool_", chainName, ".", tokenName, ".json"));
-        console.log("Writing deployed token pool address to file:", poolFileName);
-        vm.writeJson(finalJson, poolFileName);
     }
 }

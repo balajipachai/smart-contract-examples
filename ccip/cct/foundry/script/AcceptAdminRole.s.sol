@@ -13,8 +13,7 @@ contract AcceptAdminRole is Script {
         string memory tokenName = vm.envString("TOKEN_NAME");
         // Construct the path to the deployed token JSON file
         string memory root = vm.projectRoot();
-        string memory deployedTokenPath =
-            string.concat(root, "/script/output/deployedToken_", chainName, ".", tokenName, ".json");
+        string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken.json");
 
         // Extract the deployed token address from the JSON file
         address tokenAddress = HelperUtils.getAddressFromJson(

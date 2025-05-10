@@ -1,9 +1,11 @@
 {
   "deployedTokenPool_puppynet": {
-    "BnMV3": "0x7370211e34FFDEF4f0166Fb7a7ddF59c2C38D248"
+    "BnMV3": "0x7370211e34FFDEF4f0166Fb7a7ddF59c2C38D248",
+    "LnRV1": "0x5AcF5Cb1D396A028da978EFdeeaeb00c32B04b3C"
   },
   "deployedTokenPool_ethereumSepolia": {
-    "BnMV3": "0x2c6fb2F7172e42Ea7eaFef73adb14c42e088CBA5"
+    "BnMV3": "0x2c6fb2F7172e42Ea7eaFef73adb14c42e088CBA5",
+    "LnRV1": "0xA6EC35C0CcdE898465FE38698aeaD85fD9F81d29"
   },
   "deployedTokenPool_shibarium": "0x0000000000000000000000000000000000000000",
   "deployedTokenPool_ethereumMainnet": "0x0000000000000000000000000000000000000000",

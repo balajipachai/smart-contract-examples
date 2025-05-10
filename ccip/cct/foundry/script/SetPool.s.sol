@@ -14,10 +14,8 @@ contract SetPool is Script {
         string memory tokenName = vm.envString("TOKEN_NAME");
         // Construct paths to the JSON files containing deployed token and pool addresses
         string memory root = vm.projectRoot();
-        string memory deployedTokenPath =
-            string.concat(root, "/script/output/deployedToken_", chainName, ".", tokenName, ".json");
-        string memory deployedPoolPath =
-            string.concat(root, "/script/output/deployedTokenPool_", chainName, ".", tokenName, ".json");
+        string memory deployedTokenPath = string.concat(root, "/script/output/deployedToken.json");
+        string memory deployedPoolPath = string.concat(root, "/script/output/deployedTokenPool.json");
 
         // Extract the deployed token and pool addresses from the JSON files
         address tokenAddress = HelperUtils.getAddressFromJson(
