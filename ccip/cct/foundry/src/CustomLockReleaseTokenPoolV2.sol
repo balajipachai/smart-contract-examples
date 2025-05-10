@@ -4,27 +4,26 @@ pragma solidity 0.8.24;
 import {ILiquidityContainer} from
     "@chainlink/contracts-ccip/src/v0.8/liquiditymanager/interfaces/ILiquidityContainer.sol";
 import {ITypeAndVersion} from "@chainlink/contracts-ccip/src/v0.8/shared/interfaces/ITypeAndVersion.sol";
+import {IERC165} from
+    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v5.0.2/contracts/utils/introspection/IERC165.sol";
+import {SafeERC20} from
+    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IERC20} from
+    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/IERC20.sol";
 
 import {Pool} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Pool.sol";
 import {TokenPool} from "@chainlink/contracts-ccip/src/v0.8/ccip/pools/TokenPool.sol";
 
-import {IERC20} from
-    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from
-    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC165} from
-    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v5.0.2/contracts/utils/introspection/IERC165.sol";
-
-import {ERC20Predicate} from "./ERC20Predicate.sol";
 import {LockReleaseTokenPool} from "@chainlink/contracts-ccip/src/v0.8/ccip/pools/LockReleaseTokenPool.sol";
-import {AccessControl} from
-    "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/access/AccessControl.sol";
 
+import {ITokenPredicate} from "./erc20-predicate/ITokenPredicate.sol";
+import {LogConstructor} from "./erc20-predicate/LogConstructor.sol";
 /// @notice Token pool used for tokens on their native chain. This uses a lock and release mechanism.
 /// Because of lock/unlock requiring liquidity, this pool contract also has function to add and remove
 /// liquidity. This allows for proper bookkeeping for both user and liquidity provider balances.
 /// @dev One token per LockReleaseTokenPool.
-contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityContainer, ITypeAndVersion {
+
+contract CustomLockReleaseTokenPoolV2 is TokenPool, LogConstructor, ILiquidityContainer, ITypeAndVersion {
     using SafeERC20 for IERC20;
 
     error InsufficientLiquidity();
@@ -41,6 +40,8 @@ contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityCo
     bool internal immutable i_acceptLiquidity;
     /// @notice The address of the rebalancer.
     address internal s_rebalancer;
+    /// @notice The address of the predicate.
+    ITokenPredicate internal i_predicate;
 
     constructor(
         IERC20 token,
@@ -48,9 +49,17 @@ contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityCo
         address[] memory allowlist,
         address rmnProxy,
         bool acceptLiquidity,
-        address router
+        address router,
+        address predicate
     ) TokenPool(token, localTokenDecimals, allowlist, rmnProxy, router) {
         i_acceptLiquidity = acceptLiquidity;
+        i_predicate = ITokenPredicate(predicate);
+    }
+
+    /// @notice Updates the predicate.
+    /// @param predicate The address of the new predicate.
+    function updatePredicate(address predicate) external onlyOwner {
+        i_predicate = ITokenPredicate(predicate);
     }
 
     /// @notice Locks the token in the pool
@@ -64,6 +73,14 @@ contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityCo
         _validateLockOrBurn(lockOrBurnIn);
 
         emit Locked(msg.sender, lockOrBurnIn.amount);
+
+        // TODO: The original sender must approve address(this) for the amounts to be locked into the Predicate
+        i_predicate.lockTokens(
+            lockOrBurnIn.originalSender,
+            abi.decode(lockOrBurnIn.receiver, (address)),
+            address(getToken()),
+            abi.encode(lockOrBurnIn.amount)
+        );
 
         return Pool.LockOrBurnOutV1({
             destTokenAddress: getRemoteToken(lockOrBurnIn.remoteChainSelector),
@@ -86,7 +103,13 @@ contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityCo
             _calculateLocalAmount(releaseOrMintIn.amount, _parseRemoteDecimals(releaseOrMintIn.sourcePoolData));
 
         // Release to the recipient
-        getToken().safeTransfer(releaseOrMintIn.receiver, localAmount);
+        // getToken().safeTransfer(releaseOrMintIn.receiver, localAmount);
+
+        // Instead of the above, call i_predicate.exitTokens
+        bytes memory logRLPList = LogConstructor.constructLog(
+            abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), releaseOrMintIn.amount
+        );
+        i_predicate.exitTokens(abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), logRLPList);
 
         emit Released(msg.sender, releaseOrMintIn.receiver, localAmount);
 
@@ -94,13 +117,8 @@ contract CustomLockReleaseTokenPoolV1 is ERC20Predicate, TokenPool, ILiquidityCo
     }
 
     /// @inheritdoc IERC165
-    function supportsInterface(bytes4 interfaceId)
-        public
-        pure
-        virtual
-        override(TokenPool, AccessControl)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public pure virtual override returns (bool) {
+        // Pool.CCIP_POOL_V1 = 0xaff2afbf
         return interfaceId == type(ILiquidityContainer).interfaceId || super.supportsInterface(interfaceId);
     }
 
