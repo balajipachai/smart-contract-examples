@@ -105,11 +105,10 @@ contract CustomLockReleaseTokenPoolV2 is TokenPool, LogConstructor, ILiquidityCo
         uint256 localAmount =
             _calculateLocalAmount(releaseOrMintIn.amount, _parseRemoteDecimals(releaseOrMintIn.sourcePoolData));
 
+        // TODO: This Logic Might Change in the Future
         // Instead of the above, call i_predicate.exitTokens
-        bytes memory logRLPList = constructLog(
-            abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), releaseOrMintIn.amount
-        );
-        i_predicate.exitTokens(abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), logRLPList);
+        bytes memory logRLPList = constructLog(address(this), address(0), releaseOrMintIn.amount);
+        i_predicate.exitTokens(address(0), address(getToken()), logRLPList);
 
         // Release to the recipient
         getToken().safeTransfer(releaseOrMintIn.receiver, localAmount);
