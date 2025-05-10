@@ -74,9 +74,12 @@ contract CustomLockReleaseTokenPoolV2 is TokenPool, LogConstructor, ILiquidityCo
 
         emit Locked(msg.sender, lockOrBurnIn.amount);
 
+        // Give Approval to the Predicate contract to spend the tokens
+        getToken().approve(address(i_predicate), lockOrBurnIn.amount);
+
         // TODO: The original sender must approve address(this) for the amounts to be locked into the Predicate
         i_predicate.lockTokens(
-            lockOrBurnIn.originalSender,
+            address(this), // Since, tokens will be locked in the TokenPool contract
             abi.decode(lockOrBurnIn.receiver, (address)),
             address(getToken()),
             abi.encode(lockOrBurnIn.amount)
@@ -102,14 +105,14 @@ contract CustomLockReleaseTokenPoolV2 is TokenPool, LogConstructor, ILiquidityCo
         uint256 localAmount =
             _calculateLocalAmount(releaseOrMintIn.amount, _parseRemoteDecimals(releaseOrMintIn.sourcePoolData));
 
-        // Release to the recipient
-        // getToken().safeTransfer(releaseOrMintIn.receiver, localAmount);
-
         // Instead of the above, call i_predicate.exitTokens
-        bytes memory logRLPList = LogConstructor.constructLog(
+        bytes memory logRLPList = constructLog(
             abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), releaseOrMintIn.amount
         );
         i_predicate.exitTokens(abi.decode(releaseOrMintIn.originalSender, (address)), address(getToken()), logRLPList);
+
+        // Release to the recipient
+        getToken().safeTransfer(releaseOrMintIn.receiver, localAmount);
 
         emit Released(msg.sender, releaseOrMintIn.receiver, localAmount);
 

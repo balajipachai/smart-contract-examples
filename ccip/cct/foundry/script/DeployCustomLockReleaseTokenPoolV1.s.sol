@@ -4,7 +4,7 @@ pragma solidity 0.8.24;
 import {Script, console} from "forge-std/Script.sol";
 import {HelperUtils} from "./utils/HelperUtils.s.sol"; // Utility functions for JSON parsing and chain info
 import {HelperConfig} from "./HelperConfig.s.sol"; // Network configuration helper
-import {CustomLockReleaseTokenPool} from "../src/CustomLockReleaseTokenPool.sol";
+import {CustomLockReleaseTokenPoolV1} from "../src/CustomLockReleaseTokenPoolV1.sol";
 import {IERC20} from
     "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/interfaces/IERC20.sol";
 
@@ -34,7 +34,7 @@ contract DeployCustomLockReleaseTokenPool is Script {
         vm.startBroadcast();
 
         // Deploy the LockReleaseTokenPool contract associated with the token
-        CustomLockReleaseTokenPool tokenPool = new CustomLockReleaseTokenPool(
+        CustomLockReleaseTokenPoolV1 tokenPool = new CustomLockReleaseTokenPoolV1(
             IERC20(tokenAddress),
             18, // The number of decimals of the token
             new address[](0), // Empty array for initial operators
